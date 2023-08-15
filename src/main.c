@@ -1,67 +1,85 @@
 #include <curses.h>
 #include <ncurses.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
-#define draw_ball(window, ball)   draw_obj(window, (ball).y, (ball).x, (ball).character);
-#define draw_paddle(window, p) draw_obj(window, (p).y, (p).x, (p).character);
-
-#define create_player(window)  create_paddle(window, (getmaxy(window) - 1) / 2, getbegx(window) + 5);
-#define create_enemy(window)   create_paddle(window, (getmaxy(window) - 1) / 2, getmaxx(window) - 5);
+#define draw_ball(window, ball)       draw_obj(window, (ball).ypos, (ball).xpos, (ball).character);
+#define create_player(window)         create_paddle((getmaxy(window) - 1) / 2, getbegx(window) + 5);
+#define create_enemy(window)          create_paddle((getmaxy(window) - 1) / 2, getmaxx(window) - 5);
+#define clear_obj(window, ypos, xpos) draw_obj(window, ypos, xpos, ' ')
 
 typedef struct Paddle {
     char character;
-    int y, x;
+    int  height, width, ypos, xpos;
 } PADDLE;
 
 typedef struct Ball {
     char character;
-    int y, x, y_velocity, x_velocity;
+    int  ypos, xpos, yvel, xvel;
 } BALL;
 
-PADDLE create_paddle(WINDOW *window, int y, int x) {
-    PADDLE p;
-    p.character = '|';
-    p.y = y;
-    p.x = x;
-    return p;
+PADDLE create_paddle(int ypos, int xpos) {
+    PADDLE paddle;
+    paddle.character = '|';
+    paddle.height    = 5;
+    paddle.width     = 2;
+    paddle.ypos      = ypos - paddle.height / 2;
+    paddle.xpos      = xpos;
+    return paddle;
 }
 
 BALL create_ball(WINDOW *window) {
     BALL ball;
     ball.character = 'O';
-    ball.y = (getmaxy(window) - 1) / 2;
-    ball.x = (getmaxx(window) - 1) / 2;
-    ball.y_velocity = ball.x_velocity = 1;
+    ball.ypos      = (getmaxy(window) - 1) / 2;
+    ball.xpos      = (getmaxx(window) - 1) / 2;
+    ball.yvel      = ball.xvel = 1;
     return ball;
 }
 
-void draw_obj(WINDOW *window, int y, int x, char character) {
-    mvwaddch(window, y, x, character);
+void draw_obj(WINDOW *window, int ypos, int xpos, char character) {
+    mvwaddch(window, ypos, xpos, character);
     wrefresh(window);
 }
 
+void draw_paddle(WINDOW *window, PADDLE paddle) {
+    for(size_t i = 0; i < paddle.height; i++) {
+        for(size_t j = 0; j < paddle.width; j++) {
+            draw_obj(window, paddle.ypos+i, paddle.xpos+((paddle.xpos > 5) ? -j : j), paddle.character);
+        }
+    }
+}
+
+void clear_paddle(WINDOW *window, PADDLE paddle) {
+    for(size_t i = 0; i < paddle.height; i++) {
+        for(size_t j = 0; j < paddle.width; j++) {
+            clear_obj(window, paddle.ypos+i, paddle.xpos+((paddle.xpos > 5) ? -j : j));
+        }
+    }
+}
+
 void ball_move(WINDOW *window, BALL *ball) {
-    mvwaddch(window, ball->y, ball->x, ' ');
-    if(ball->y + 2 == getmaxy(window) || ball->y - 1 == getbegy(window)) ball->y_velocity = -ball->y_velocity;
-    if(ball->x + 2 == getmaxx(window) || ball->x - 1 == getbegx(window)) ball->x_velocity = -ball->x_velocity; 
-    ball->y += ball->y_velocity;
-    ball->x += ball->x_velocity;
+    clear_obj(window, ball->ypos, ball->xpos);
+    if(ball->ypos + 2 == getmaxy(window) || ball->ypos - 1 == getbegy(window)) ball->yvel = -ball->yvel;
+    if(ball->xpos + 2 == getmaxx(window) || ball->xpos - 1 == getbegx(window)) ball->xvel = -ball->xvel; 
+    ball->ypos += ball->yvel;
+    ball->xpos += ball->xvel;
     draw_ball(window, *ball);
 }
 
 void player_move(WINDOW *window, PADDLE *player, chtype key) {
-    mvwaddch(window, player->y, player->x, ' ');
-    const chtype UP = 119, DOWN = 115;
-    switch(key) {
-        case UP:
-            if(player->y - 1 != getbegy(window)) player->y--;
-            break;
-        case DOWN:
-            if(player->y + 2 != getmaxy(window)) player->y++;
-            break;
+    if (key == KEY_UP || key == KEY_DOWN) {
+        clear_paddle(window, *player);
+        switch(key) {
+            case KEY_UP:
+                if(player->ypos - (player->height / 2) + 1 != getbegy(window)) player->ypos--;
+                break;
+            case KEY_DOWN:
+                if(player->ypos + (player->height + 1) != getmaxy(window)) player->ypos++;
+                break;
+        }
+        draw_paddle(window, *player);
     }
-    draw_paddle(window, *player);
 }
 
 void start_curses() {
@@ -72,6 +90,7 @@ void start_curses() {
 }
 
 void init_window(WINDOW *window) {
+    keypad(window, true);
     nodelay(window, true);
     box(window, 0, 0);
     wmove(window, 1, 2);
@@ -92,6 +111,7 @@ int main() {
     PADDLE enemy = create_enemy(window);
     draw_paddle(window, enemy);
 
+    // game loop
     while(true) {
         chtype key = wgetch(window);
         player_move(window, &player, key);
@@ -99,7 +119,6 @@ int main() {
         napms(40);
     }
 
-    getch();
     endwin();
     return 0;
 }
