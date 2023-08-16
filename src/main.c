@@ -68,7 +68,7 @@ void ball_move(WINDOW *window, BALL *ball) {
 }
 
 void player_move(WINDOW *window, PADDLE *player, chtype key) {
-    if (key == KEY_UP || key == KEY_DOWN) {
+    if(key == KEY_UP || key == KEY_DOWN) {
         clear_paddle(window, *player);
         switch(key) {
             case KEY_UP:
@@ -79,6 +79,17 @@ void player_move(WINDOW *window, PADDLE *player, chtype key) {
                 break;
         }
         draw_paddle(window, *player);
+    }
+}
+
+void enemy_move(WINDOW *window, PADDLE *enemy, BALL ball) {
+    if(ball.ypos - enemy->height / 2 != enemy->ypos && ball.xvel > 0 && ball.xpos > (getmaxx(window) / 2)) {
+        clear_paddle(window, *enemy);
+        if(ball.ypos < enemy->ypos + (enemy->height - 2)
+            && enemy->ypos - (enemy->height / 2) + 1 != getbegy(window)) enemy->ypos--;
+        if(ball.ypos > enemy->ypos + (enemy->height - (enemy->height/2 + 2))
+            && enemy->ypos + (enemy->height + 1) != getmaxy(window)) enemy->ypos++;
+        draw_paddle(window, *enemy);
     }
 }
 
@@ -115,7 +126,9 @@ int main() {
     while(true) {
         chtype key = wgetch(window);
         player_move(window, &player, key);
+        flushinp();
         ball_move(window, &ball);
+        enemy_move(window, &enemy, ball);
         napms(40);
     }
 
