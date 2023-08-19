@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -O2 -Wall -Wextra -Werror -l ncurses
-BUILD_DIR := build/pong
+BUILD_DIR := build/cong
 
 all: build
 
@@ -14,14 +14,13 @@ $(BUILD_DIR)/src/main.o: src/main.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c src/main.c -o $(BUILD_DIR)/src/main.o
 
 build: $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/main.o | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/main.o -o $(BUILD_DIR)/pong.out
+	$(CC) $(CFLAGS) $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/main.o -o $(BUILD_DIR)/cong.out
 
 run: build
-	$(BUILD_DIR)/pong.out
+	$(BUILD_DIR)/cong.out
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/src
 
 clean:
-	rm -rf $(BUILD_DIR)/pong.out
-	rm -rf $(BUILD_DIR)/src
+	rm -rf $(BUILD_DIR)

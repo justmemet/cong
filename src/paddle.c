@@ -10,9 +10,9 @@ typedef struct Paddle {
 PADDLE create_paddle(int ypos, int xpos) {
     PADDLE paddle;
     paddle.character = '|';
-    paddle.height    = 5;
+    paddle.height    = 10;
     paddle.width     = 3;
-    paddle.y         = ypos - paddle.height / 2;
+    paddle.y         = (ypos - 1) - paddle.height / 2;
     paddle.x         = xpos + ((xpos > 0) ? -(paddle.width + 5) : 5);
     return paddle;
 }
@@ -38,8 +38,8 @@ void control_paddle(WINDOW *window, PADDLE *paddle, chtype key) {
         clear_paddle(window, *paddle);
         switch(key) {
             case KEY_UP: {
-                int paddle_top_y = paddle->y - paddle->height / 2;
-                if(paddle_top_y + 1 != getbegy(window))
+                int paddle_top_y = paddle->y - 1;
+                if(paddle_top_y != getbegy(window))
                     paddle->y--;
                 break;
             }
@@ -57,14 +57,16 @@ void control_paddle(WINDOW *window, PADDLE *paddle, chtype key) {
 void bot_move(WINDOW *window, PADDLE *bot, BALL ball) {
     if(ball.y - bot->height / 2 != bot->y && abs(ball.x - bot->x) < getmaxx(window) / 3) {
         clear_paddle(window, *bot);
-        int bot_top_y    = bot->y - bot->height / 2, 
+        int bot_top_y    = bot->y - 1, 
             bot_bottom_y = bot->y + bot->height,
             bot_center   = bot->y + bot->height / 2;
 
         if(ball.y < bot_center
-            && bot_top_y + 1 != getbegy(window)) bot->y--;
+            && bot_top_y != getbegy(window))
+            bot->y--;
         if(ball.y > bot_center
-            && bot_bottom_y + 1 != getmaxy(window)) bot->y++;
+            && bot_bottom_y + 1 != getmaxy(window))
+            bot->y++;
         draw_paddle(window, *bot);
     }
 }
