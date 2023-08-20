@@ -34,8 +34,14 @@ int main() {
     // game loop
     while(score[0] < 9 && score[1] < 9) {
         control_paddle(window, &player, wgetch(window));
-        ball_move(window, &ball, score, '|');
         bot_move(window, &bot, ball);
+
+        ball_move(window, &ball, score);
+        if(ball.hori_dir < 0)
+            detect_ball_collision(player, &ball);
+        else if(ball.hori_dir > 0)
+            detect_ball_collision(bot, &ball);
+
         wrefresh(window);
         napms(40);
     }

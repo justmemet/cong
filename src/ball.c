@@ -1,7 +1,6 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include "game.h"
 
 typedef struct Ball {
@@ -34,26 +33,35 @@ void erase_ball(WINDOW *window, BALL ball) {
         mvwaddch(window, ball.y, ball.x, ' ');
 }
 
-void ball_move(WINDOW *window, BALL *ball, int *score, char player_char) {
-    erase_ball(window, *ball);
-    int projected_y = ball->y + 1 * ball->verti_dir;
-    int projected_x = ball->x + 1 * ball->hori_dir;
-    
-    if(projected_y + 1 >= getmaxy(window) || projected_y <= getbegy(window))
-        ball->verti_dir = -ball->verti_dir;
-    if(projected_x <= getbegx(window)) {
-        reset_ball(window, ball);
-        score[1]++;
-        display_score(window, score);
-    }
-    if(projected_x + 1 >= getmaxx(window)) {
-        reset_ball(window, ball);
-        score[0]++;
-        display_score(window, score);
-    }
+void ball_projection(BALL ball, int *proj_y, int *proj_x) {
+    *proj_y = ball.y + 1 * ball.verti_dir;
+    *proj_x = ball.x + 1 * ball.hori_dir;
+}
 
-    if((mvwinch(window, projected_y, projected_x) & A_CHARTEXT) == (unsigned) player_char)
-        ball->hori_dir = -ball->hori_dir;
+static bool detect_verti_collision(WINDOW *window, int proj_y) {
+    return proj_y + 1 >= getmaxy(window) || proj_y <= getbegy(window);
+}
+
+static bool detect_hori_collision(WINDOW *window, int proj_x) {
+    return proj_x + 1 >= getmaxx(window) || proj_x <= getbegx(window);
+}
+
+void ball_move(WINDOW *window, BALL *ball, int *score) {
+    erase_ball(window, *ball);
+    int proj_y;
+    int proj_x;
+    ball_projection(*ball, &proj_y, &proj_x);
+    
+    if(detect_verti_collision(window, proj_y))
+        ball->verti_dir = -ball->verti_dir;
+    if(detect_hori_collision(window, proj_x)) {
+        reset_ball(window, ball);
+        if(proj_x + 1 >= getmaxx(window))
+            score[0]++;
+        else if(proj_x <= getbegx(window))
+            score[1]++;
+        display_score(window, score);
+    }
 
     ball->y += 1 * ball->verti_dir;
     ball->x += 1 * ball->hori_dir;

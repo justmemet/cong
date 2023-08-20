@@ -17,7 +17,7 @@ void init_window(WINDOW *window) {
 
 void draw_middle_line(WINDOW *window) {
     for(int i = 1; i < getmaxy(window) - 1; i++)
-        mvwaddch(window, getbegy(stdscr)+i, getmaxx(window) / 2, 'l');
+        mvwaddch(window, getbegy(stdscr)+i, getmaxx(window) / 2, '|');
 }
 
 void display_score(WINDOW *window, int *score) {
