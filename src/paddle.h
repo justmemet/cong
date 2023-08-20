@@ -4,10 +4,10 @@
 
 typedef struct Paddle {
     char character;
-    int height, width, y, x;
+    int  height, width, y, x;
 } PADDLE;
 
-extern PADDLE create_paddle(int ypos, int xpos);
+extern PADDLE create_paddle(int y, int x);
 extern void draw_paddle(WINDOW *window, PADDLE paddle);
 extern void clear_paddle(WINDOW *window, PADDLE paddle);
 

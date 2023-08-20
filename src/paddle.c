@@ -4,16 +4,16 @@
 
 typedef struct Paddle {
     char character;
-    int height, width, y, x;
+    int  height, width, y, x;
 } PADDLE;
 
-PADDLE create_paddle(int ypos, int xpos) {
+PADDLE create_paddle(int y, int x) {
     PADDLE paddle;
     paddle.character = '|';
     paddle.height    = 10;
-    paddle.width     = 3;
-    paddle.y         = (ypos - 1) - paddle.height / 2;
-    paddle.x         = xpos + ((xpos > 0) ? -(paddle.width + 5) : 5);
+    paddle.width     = 2;
+    paddle.y         = (y - 1) - paddle.height / 2;
+    paddle.x         = x + ((x > 0) ? -(paddle.width + 5) : 5);
     return paddle;
 }
 
@@ -55,7 +55,7 @@ void control_paddle(WINDOW *window, PADDLE *paddle, chtype key) {
 }
 
 void bot_move(WINDOW *window, PADDLE *bot, BALL ball) {
-    if(ball.y - bot->height / 2 != bot->y && abs(ball.x - bot->x) < getmaxx(window) / 3) {
+    if(ball.y - bot->height / 2 != bot->y && abs(bot->x - ball.x) < getmaxx(window) / 3) {
         clear_paddle(window, *bot);
         int bot_top_y    = bot->y - 1, 
             bot_bottom_y = bot->y + bot->height,

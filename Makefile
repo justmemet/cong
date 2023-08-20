@@ -10,11 +10,14 @@ $(BUILD_DIR)/src/ball.o: src/ball.c src/ball.h | $(BUILD_DIR)
 $(BUILD_DIR)/src/paddle.o: src/paddle.c src/paddle.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c src/paddle.c -o $(BUILD_DIR)/src/paddle.o
 
+$(BUILD_DIR)/src/game.o: src/game.c src/game.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c src/game.c -o $(BUILD_DIR)/src/game.o
+
 $(BUILD_DIR)/src/main.o: src/main.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c src/main.c -o $(BUILD_DIR)/src/main.o
 
-build: $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/main.o | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/main.o -o $(BUILD_DIR)/cong.out
+build: $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/game.o $(BUILD_DIR)/src/main.o | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/game.o $(BUILD_DIR)/src/main.o -o $(BUILD_DIR)/cong.out
 
 run: build
 	$(BUILD_DIR)/cong.out
