@@ -2,25 +2,22 @@ CC := gcc
 CFLAGS := -O2 -Wall -Wextra -Werror -l ncurses
 BUILD_DIR := build/cong
 
+SOURCE_FILES := $(wildcard src/*.c)
+OBJECT_FILES := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SOURCE_FILES))
+
 all: build
 
-$(BUILD_DIR)/src/ball.o: src/ball.c src/ball.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c src/ball.c -o $(BUILD_DIR)/src/ball.o
+$(BUILD_DIR)/src/%.o: src/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/src/paddle.o: src/paddle.c src/paddle.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c src/paddle.c -o $(BUILD_DIR)/src/paddle.o
-
-$(BUILD_DIR)/src/game.o: src/game.c src/game.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c src/game.c -o $(BUILD_DIR)/src/game.o
-
-$(BUILD_DIR)/src/main.o: src/main.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c src/main.c -o $(BUILD_DIR)/src/main.o
-
-build: $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/game.o $(BUILD_DIR)/src/main.o | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(BUILD_DIR)/src/ball.o $(BUILD_DIR)/src/paddle.o $(BUILD_DIR)/src/game.o $(BUILD_DIR)/src/main.o -o $(BUILD_DIR)/cong.out
+build: $(OBJECT_FILES) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(OBJECT_FILES) -o $(BUILD_DIR)/cong.out
 
 run: build
 	$(BUILD_DIR)/cong.out
+
+test:
+	echo $(OBJECT_FILES)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/src
