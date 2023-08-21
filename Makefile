@@ -16,9 +16,6 @@ build: $(OBJECT_FILES) | $(BUILD_DIR)
 run: build
 	$(BUILD_DIR)/cong.out
 
-test:
-	echo $(OBJECT_FILES)
-
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/src
 
