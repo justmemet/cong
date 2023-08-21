@@ -7,7 +7,7 @@ typedef struct Paddle {
     int  height, width, y, x;
 } PADDLE;
 
-extern PADDLE create_paddle(int y, int x);
+extern PADDLE create_paddle(char character, int height, int width, int y, int x);
 extern void draw_paddle(WINDOW *window, PADDLE paddle);
 extern void clear_paddle(WINDOW *window, PADDLE paddle);
 

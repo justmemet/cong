@@ -1,30 +1,31 @@
+#include <ctype.h>
 #include <ncurses.h>
-#include <stdlib.h>
-#include <time.h>
 #include "game.h"
 
 typedef struct Ball {
     char character;
     int  y, x;
     int  verti_dir, hori_dir;
+    int  initial_y, initial_x;
 } BALL;
 
-BALL create_ball(WINDOW *window) {
+BALL create_ball(char character, int y, int x, int verti_dir, int hori_dir) {
     BALL ball;
-    ball.character = 'O';
-    ball.y         = rand() % getmaxy(window) - 1 + 1;
-    ball.x         = (getmaxx(window) - 1) / 2;
-    ball.verti_dir = ball.hori_dir = 1;
+    ball.character = character;
+    ball.initial_y = ball.y = y - 1;
+    ball.initial_x = ball.x = x - 1;
+    ball.verti_dir = verti_dir;
+    ball.hori_dir  = hori_dir;
     return ball;
 }
 
-void reset_ball(WINDOW *window, BALL *ball) {
-    ball->y = rand() % getmaxy(window) - 1 + 1;
-    ball->x = (getmaxx(window) - 1) / 2;
+void reset_ball(BALL *ball) {
+    ball->y = ball->initial_y;
+    ball->x = ball->initial_x;
 }
 
 void draw_ball(WINDOW *window, BALL ball) {
-    if((mvwinch(window, ball.y, ball.x) & A_CHARTEXT) == ' ')
+    if(isblank(mvwinch(window, ball.y, ball.x) & A_CHARTEXT))
         mvwaddch(window, ball.y, ball.x, ball.character);
 }
 
@@ -55,7 +56,7 @@ void ball_move(WINDOW *window, BALL *ball, int *score) {
     if(detect_verti_collision(window, proj_y))
         ball->verti_dir = -ball->verti_dir;
     if(detect_hori_collision(window, proj_x)) {
-        reset_ball(window, ball);
+        reset_ball(ball);
         if(proj_x + 1 >= getmaxx(window))
             score[0]++;
         else if(proj_x <= getbegx(window))

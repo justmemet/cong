@@ -1,27 +1,52 @@
 #include <ncurses.h>
-#include <stdlib.h>
-#include <time.h>
 
-#include "game.h"
 #include "ball.h"
+#include "game.h"
 #include "paddle.h"
 
+#define BALL_CHARACTER   'O'
+#define BALL_Y           getmaxy(window) / 2
+#define BALL_X           getmaxx(window) / 2
+#define BALL_VERTI_DIR   1
+#define BALL_HORI_DIR    1
+
+#define PADDLE_CHARACTER '|'
+#define PADDLE_HEIGHT    10
+#define PADDLE_WIDTH     2
+
+#define PLAYER_Y         getmaxy(window) / 2
+#define PLAYER_x         getbegx(window)
+
+#define ENEMY_Y          getmaxy(window) / 2
+#define ENEMY_x          getmaxx(window)
+
 int main() {
-    srand(time(NULL));
     init_curses();
     WINDOW *window = stdscr;
     init_window(window);
     int score[] = {0, 0};
 
     // graphics
-    BALL ball = create_ball(window);
+    BALL ball = create_ball(
+        BALL_CHARACTER,
+        BALL_Y,
+        BALL_X,
+        BALL_VERTI_DIR,
+        BALL_HORI_DIR
+    );
     PADDLE player = create_paddle(
-        (getmaxy(window) - 1) / 2,
-        getbegx(window)
+        PADDLE_CHARACTER,
+        PADDLE_HEIGHT,
+        PADDLE_WIDTH,
+        PLAYER_Y,
+        PLAYER_x
     );
     PADDLE bot = create_paddle(
-        (getmaxy(window) - 1) / 2,
-        getmaxx(window)
+        PADDLE_CHARACTER,
+        PADDLE_HEIGHT,
+        PADDLE_WIDTH,
+        ENEMY_Y,
+        ENEMY_x
     );
 
     display_score(window, score);
