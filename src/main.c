@@ -85,6 +85,6 @@ int main() {
         napms(40);
     }
 
-    endwin();
+    end_curses();
     return 0;
 }
