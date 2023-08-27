@@ -1,6 +1,6 @@
 #include <ctype.h>
 #include <ncurses.h>
-#include "game.h"
+#include "window.h"
 
 typedef struct Ball {
     char character;
@@ -39,11 +39,11 @@ void ball_projection(BALL ball, int *proj_y, int *proj_x) {
     *proj_x = ball.x + 1 * ball.hori_dir;
 }
 
-static bool detect_verti_collision(WINDOW *window, int proj_y) {
+static bool detect_roof_collision(WINDOW *window, int proj_y) {
     return proj_y + 1 >= getmaxy(window) || proj_y <= getbegy(window);
 }
 
-static bool detect_hori_collision(WINDOW *window, int proj_x) {
+static bool detect_wall_collision(WINDOW *window, int proj_x) {
     return proj_x + 1 >= getmaxx(window) || proj_x <= getbegx(window);
 }
 
@@ -53,9 +53,9 @@ void ball_move(WINDOW *window, BALL *ball, int *score) {
     int proj_x;
     ball_projection(*ball, &proj_y, &proj_x);
     
-    if(detect_verti_collision(window, proj_y))
+    if(detect_roof_collision(window, proj_y))
         ball->verti_dir = -ball->verti_dir;
-    if(detect_hori_collision(window, proj_x)) {
+    if(detect_wall_collision(window, proj_x)) {
         reset_ball(ball);
         if(proj_x + 1 >= getmaxx(window))
             score[0]++;

@@ -1,6 +1,8 @@
 CC := gcc
 CFLAGS := -O2 -Wall -Wextra -Werror -l ncurses
+
 BUILD_DIR := build/cong
+INCLUDE_DIR := include
 
 SOURCE_FILES := $(wildcard src/*.c)
 OBJECT_FILES := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SOURCE_FILES))
@@ -8,7 +10,7 @@ OBJECT_FILES := $(patsubst %.c,$(BUILD_DIR)/%.o,$(SOURCE_FILES))
 all: build
 
 $(BUILD_DIR)/src/%.o: src/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -I ./include/ -c $< -o $@
+	$(CC) $(CFLAGS) -I $(INCLUDE_DIR) -c $< -o $@
 
 build: $(OBJECT_FILES) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(OBJECT_FILES) -o $(BUILD_DIR)/cong.out

@@ -33,7 +33,7 @@ void clear_paddle(WINDOW *window, PADDLE paddle) {
     }
 }
 
-static void get_paddle_parts_posi(PADDLE paddle, int *paddle_top, int *paddle_center, int *paddle_bottom) {
+static void get_paddle_parts_position(PADDLE paddle, int *paddle_top, int *paddle_center, int *paddle_bottom) {
     *paddle_top    = paddle.y;
     *paddle_center = paddle.y + paddle.height / 2;
     *paddle_bottom = paddle.y + paddle.height;
@@ -43,7 +43,7 @@ void detect_ball_collision(PADDLE paddle, BALL *ball) {
     int proj_y, proj_x;
     int paddle_top, paddle_center, paddle_bottom;
     ball_projection(*ball, &proj_y, &proj_x);
-    get_paddle_parts_posi(paddle, &paddle_top, &paddle_center, &paddle_bottom);
+    get_paddle_parts_position(paddle, &paddle_top, &paddle_center, &paddle_bottom);
 
     if(ball->x < 10)
         proj_x--;
@@ -71,7 +71,7 @@ void control_paddle(WINDOW *window, PADDLE *paddle, chtype key) {
     if(key == KEY_UP || key == KEY_DOWN) {
         clear_paddle(window, *paddle);
         int paddle_top, _, paddle_bottom;
-        get_paddle_parts_posi(*paddle, &paddle_top, &_, &paddle_bottom);
+        get_paddle_parts_position(*paddle, &paddle_top, &_, &paddle_bottom);
         switch(key) {
             case KEY_UP:
                 if(paddle_top - 1 != getbegy(window))
@@ -90,7 +90,7 @@ void bot_move(WINDOW *window, PADDLE *bot, BALL ball) {
     if(abs(bot->x - ball.x) < getmaxx(window) / 3) {
         clear_paddle(window, *bot);
         int bot_top, bot_bottom, bot_center;
-        get_paddle_parts_posi(*bot, &bot_top, &bot_center, &bot_bottom);
+        get_paddle_parts_position(*bot, &bot_top, &bot_center, &bot_bottom);
         if(ball.y < bot_center
             && bot_top - 1 != getbegy(window))
             bot->y--;

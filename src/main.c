@@ -1,12 +1,13 @@
 #include <ncurses.h>
+#include <stdlib.h>
 
 #include "ball.h"
-#include "game.h"
 #include "paddle.h"
+#include "window.h"
 
 #define BALL_CHARACTER   'O'
-#define BALL_Y           getmaxy(window) / 2
-#define BALL_X           getmaxx(window) / 2
+#define BALL_Y           getmaxy(game_window) / 2
+#define BALL_X           getmaxx(game_window) / 2
 #define BALL_VERTI_DIR   1
 #define BALL_HORI_DIR    1
 
@@ -14,19 +15,33 @@
 #define PADDLE_HEIGHT    10
 #define PADDLE_WIDTH     2
 
-#define PLAYER_Y         getmaxy(window) / 2
-#define PLAYER_x         getbegx(window)
+#define PLAYER_Y         getmaxy(game_window) / 2
+#define PLAYER_x         getbegx(game_window)
 
-#define ENEMY_Y          getmaxy(window) / 2
-#define ENEMY_x          getmaxx(window)
+#define ENEMY_Y          getmaxy(game_window) / 2
+#define ENEMY_x          getmaxx(game_window)
+
+void init_curses() {
+    initscr();
+    cbreak();
+    noecho();
+    curs_set(0);
+}
+
+void end_curses() {
+    clear();
+    endwin();
+    exit(0);
+}
 
 int main() {
     init_curses();
-    WINDOW *window = stdscr;
-    init_window(window);
+    WINDOW *terminal_screen = stdscr;
     int score[] = {0, 0};
 
-    // graphics
+    WINDOW *game_window = terminal_screen;
+    init_game_window(game_window);
+
     BALL ball = create_ball(
         BALL_CHARACTER,
         BALL_Y,
@@ -49,25 +64,24 @@ int main() {
         ENEMY_x
     );
 
-    display_score(window, score);
-    draw_middle_line(window);
-    draw_ball(window, ball);
-    draw_paddle(window, player);
-    draw_paddle(window, bot);
-    wrefresh(window);
+    display_score(game_window, score);
+    draw_middle_line(game_window);
+    draw_ball(game_window, ball);
+    draw_paddle(game_window, player);
+    draw_paddle(game_window, bot);
+    wrefresh(game_window);
 
-    // game loop
     while(score[0] < 9 && score[1] < 9) {
-        control_paddle(window, &player, wgetch(window));
-        bot_move(window, &bot, ball);
+        control_paddle(game_window, &player, wgetch(game_window));
+        bot_move(game_window, &bot, ball);
 
-        ball_move(window, &ball, score);
+        ball_move(game_window, &ball, score);
         if(ball.hori_dir < 0)
             detect_ball_collision(player, &ball);
         else if(ball.hori_dir > 0)
             detect_ball_collision(bot, &ball);
 
-        wrefresh(window);
+        wrefresh(game_window);
         napms(40);
     }
 
